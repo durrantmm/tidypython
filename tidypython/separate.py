@@ -1,7 +1,7 @@
 import dplython
 from dplython import Verb, DplyFrame, X, select, mutate, head
 from readpy import *
-
+import re
 
 class separate(Verb):
 
@@ -23,8 +23,19 @@ class separate(Verb):
         else:
             raise ValueError("You must provide at least two arguments, the key and the value.")
 
+        if len(self.args) == 3:
+            if not isinstance(self.args[2], str):
+                raise ValueError("Third argument should be the string separator.")
 
-        splitcol = list(map(lambda x: x.split('_'), df[sp_col]))
+            sep = self.args[2]
+
+        elif 'sep' in self.kwargs:
+            sep = self.kwargs['sep']
+        else:
+            sep = '[^\w]+'
+
+
+        splitcol = list(map(lambda x: re.compile(sep).split(x), df[sp_col]))
 
         for i, into_col in enumerate(sp_into):
             df[into_col] = [row[i] for row in splitcol]
