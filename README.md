@@ -7,7 +7,7 @@ Install the package with pip:
     
 Load the functions into your script with:
 
-    from tidypy import *
+    from tidypython import *
     
 You will then have access to the functions:
 
