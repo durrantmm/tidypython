@@ -10,7 +10,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='tidypython',
-    version='0.0.1.dev2',
+    version='0.0.1.dev3',
     description='A package designed to syntactically mimic the tidyr R package',
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -21,6 +21,7 @@ setup(
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),  # Required,
     install_requires = [
         'pandas',
-        'dplython'
+        'dplython',
+        'readpy'
     ]
 )

@@ -54,8 +54,7 @@ class gather(Verb):
                     all_id_cols.remove(arg._name)
                     all_value_cols.append(arg._name)
 
-
-        outdf = DplyFrame(df.melt(df, id_vars=all_id_cols, value_vars=all_value_cols))
+        outdf = DplyFrame(df.melt(id_vars=all_id_cols, value_vars=all_value_cols))
 
 
         cols = list(outdf.columns)
@@ -67,3 +66,9 @@ class gather(Verb):
 
     def __rrshift__(self, other):
         return self.__call__(DplyFrame(other.copy(deep=True)))
+
+
+if __name__ == '__main__':
+
+    mtcars = read_tsv('test/data/mtcars.tsv')
+    print(mtcars >> gather(X.info, X.val, X.mpg, X.cyl, X.disp, X.hp, X.drat, X.wt, X.qsec, X.vs, X.am, X.gear, X.carb))

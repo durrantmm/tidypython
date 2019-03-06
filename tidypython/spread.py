@@ -1,6 +1,8 @@
+import sys
 import dplython
 from dplython import Verb, DplyFrame, X, select, mutate, head
 from readpy import *
+from tidypython import gather
 
 
 class spread(Verb):
@@ -25,12 +27,19 @@ class spread(Verb):
 
         multiindex = [s for s in df.columns if s != sp_key and s != sp_value]
 
-
         outdf = DplyFrame(df.set_index(multiindex).pivot(columns=sp_key, values=sp_value)).reset_index()
         outdf.columns.name = None
+
+        outdf = outdf[multiindex + list(dict.fromkeys(df[sp_key]))]
 
         return outdf
 
 
     def __rrshift__(self, other):
         return self.__call__(DplyFrame(other.copy(deep=True)))
+
+if __name__ == '__main__':
+
+    mtcars = read_tsv('test/data/mtcars.tsv')
+    gathered = mtcars >> gather(X.info, X.val, X.mpg, X.cyl, X.disp, X.hp, X.drat, X.wt, X.qsec, X.vs, X.am, X.gear, X.carb)
+    print(gathered >> spread(X.info, X.val) >> head())

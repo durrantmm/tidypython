@@ -23,7 +23,7 @@ class separate(Verb):
         else:
             raise ValueError("You must provide at least two arguments, the key and the value.")
 
-        if len(self.args) == 3:
+        if len(self.args) >= 3:
             if not isinstance(self.args[2], str):
                 raise ValueError("Third argument should be the string separator.")
 
@@ -31,14 +31,16 @@ class separate(Verb):
 
         elif 'sep' in self.kwargs:
             sep = self.kwargs['sep']
-        else:
-            sep = '[^\w]+'
 
+        else:
+            sep = r'[^\w]+'
+
+        print(sep)
 
         splitcol = list(map(lambda x: re.compile(sep).split(x), df[sp_col]))
 
         for i, into_col in enumerate(sp_into):
-            df[into_col] = [row[i] for row in splitcol]
+            df[into_col] = [row[i] if len(row) > i else None for row in splitcol]
 
         columns = list(df.columns)
 
@@ -49,3 +51,18 @@ class separate(Verb):
 
     def __rrshift__(self, other):
         return self.__call__(DplyFrame(other.copy(deep=True)))
+
+
+if __name__ == '__main__':
+
+    mtcars = read_tsv('test/data/mtcars.tsv')
+    mtcars = mtcars >> select(X.name, X.mpg, X.cyl)
+
+    d = zip(map(str, mtcars['name']), map(str, mtcars['mpg']), map(str, mtcars['cyl']))
+    d = ['|'.join(x) for x in d]
+    mtcars['name'] = d
+
+    mtcars = mtcars >> select(X.name)
+    mtcars_clean = mtcars >> separate(X.name, ['name', 'mpg', 'cyl'], ' ')
+
+    print(mtcars_clean >> head())
